@@ -164,12 +164,14 @@ public class Oblig1 {
     /**
      * Sorts array in ascending order
      * @param a
+     * @param fra
+     * @param til
      */
     public static void sorter(int[] a, int fra, int til) {
         for(int i=fra; i<til; i++) {
             for(int j=i+1; j<til; j++) {
                 if(a[i]>a[j]) {
-                    bytt(sortert,i,j);
+                    bytt(a,i,j);
                 }
             }
         }
@@ -181,9 +183,8 @@ public class Oblig1 {
      */
 
     public static void delsortering(int[] a) {
-        int n= a.length;
+        int n = a.length;
         int antPartall = 0;
-        boolean firstInstance;
 
         // algorithm that loops over array and switches i and j if i is even and j is odd.
         for(int i=0; i<n/2; i++) {
@@ -215,7 +216,7 @@ public class Oblig1 {
          */
 
         sorter(a,0,(n-antPartall));
-        sorter(a, (n-antPartall), n));
+        sorter(a,(n-antPartall),n));
 
         /**
         // Loops over even numbers and puts them in ascending order
@@ -462,7 +463,8 @@ public class Oblig1 {
 
     public static void main(String[] args) {
         int[] a = {1, 8, -4, 9, 3, 20, 17, 59, 6};
-        System.out.println(Arrays.toString(delsortering(a)));
+        delsortering(a);
+        System.out.println(Arrays.toString(a));
 
     }
 }
