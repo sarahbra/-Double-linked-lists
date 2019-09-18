@@ -433,4 +433,8 @@ public class Oblig1 {
         }
         return new int[] {m,nm,tm};
     }
+
+    public static boolean inneholdt(String s, String t) {
+        
+    }
 }
