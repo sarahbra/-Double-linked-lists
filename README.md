@@ -2,4 +2,4 @@
 Første oblig i Algoritmer og Datastrukturer
 
 Gjort av
-Sarah Rastad
+Sarah Rastad, s317473
