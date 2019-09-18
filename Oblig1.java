@@ -216,7 +216,7 @@ public class Oblig1 {
          */
 
         sorter(a,0,(n-antPartall));
-        sorter(a,(n-antPartall),n));
+        sorter(a,(n-antPartall),n);
 
         /**
         // Loops over even numbers and puts them in ascending order
@@ -458,7 +458,7 @@ public class Oblig1 {
     }
 
     public static boolean inneholdt(String s, String t) {
-
+        return true;
     }
 
     public static void main(String[] args) {
