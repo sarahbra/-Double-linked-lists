@@ -162,6 +162,20 @@ public class Oblig1 {
     }
 
     /**
+     * Sorts array in ascending order
+     * @param a
+     */
+    public static void sorter(int[] a, int fra, int til) {
+        for(int i=fra; i<til; i++) {
+            for(int j=i+1; j<til; j++) {
+                if(a[i]>a[j]) {
+                    bytt(sortert,i,j);
+                }
+            }
+        }
+    }
+
+    /**
      * Method that sorts an array in ascending odd and ascending even numbers.
      * @param a
      */
@@ -189,6 +203,7 @@ public class Oblig1 {
             }
         }
 
+        /**
         // Loops over odd numbers and puts them in ascending order
         for(int i=0; i<(n-antPartall); i++) {
             for(int j=i+1; j<(n-antPartall); j++) {
@@ -197,7 +212,12 @@ public class Oblig1 {
                 }
             }
         }
+         */
 
+        sorter(a,0,(n-antPartall));
+        sorter(a, (n-antPartall), n));
+
+        /**
         // Loops over even numbers and puts them in ascending order
         for(int i=(n-antPartall); i<n; i++) {
             for (int j = i + 1; j < n; j++)
@@ -205,6 +225,8 @@ public class Oblig1 {
                     bytt(a, i, j);
                 }
         }
+
+         */
     }
 
     /**
@@ -435,6 +457,12 @@ public class Oblig1 {
     }
 
     public static boolean inneholdt(String s, String t) {
-        
+
+    }
+
+    public static void main(String[] args) {
+        int[] a = {1, 8, -4, 9, 3, 20, 17, 59, 6};
+        System.out.println(Arrays.toString(delsortering(a)));
+
     }
 }
