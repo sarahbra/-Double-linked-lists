@@ -1,4 +1,4 @@
-package oblig1;
+package com.company;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -32,8 +32,8 @@ public class Oblig1 {
         a[i] = a[j];
         a[j] = temp;
     }
-    
-     public static void bytt(char[] c, int i, int j) {
+
+    public static void bytt(char[] c, int i, int j) {
         char temp = c[i];
         c[i] = c[j];
         c[j] = temp;
@@ -113,7 +113,7 @@ public class Oblig1 {
      * @return antUlike
      */
 
-    public static int antUlikeSortert(int[] a) {
+    public static int antallUlikeSortert(int[] a) {
 
         int antUlike = 0;
         int n = a.length;
@@ -142,8 +142,8 @@ public class Oblig1 {
      * @return antUlike
      */
 
-    public static int antUlikeUsortert(int[] a) {
-        
+    public static int antallUlikeUsortert(int[] a) {
+
         int n = a.length;
         boolean finnes;
         int antUlike = 0;
@@ -171,19 +171,44 @@ public class Oblig1 {
     }
 
     /**
-     * Sorts array in ascending order
+     * Sorts array in ascending order by recurring method on partitions in descending size
      * @param a
      * @param fra
      * @param til
      */
-    public static void sorter(int[] a, int fra, int til) {
-        for(int i=fra; i<til; i++) {
-            for(int j=i+1; j<til; j++) {
-                if(a[i]>a[j]) {
-                    bytt(a,i,j);
-                }
+
+    public static void sorter(int a[], int fra, int til) {
+        if (fra < (til-1)) {
+            int partitionIndex = partisjon(a, fra, til);
+
+            sorter(a, fra, partitionIndex);
+            sorter(a, partitionIndex, til);
+        }
+    }
+
+    /**
+     * Method that takes last element as a pivot and checks if each other value is smaller. If that is the case, it
+     * swaps the elements.
+     * @param a
+     * @param fra
+     * @param til
+     * @return
+     */
+    private static int partisjon(int a[], int fra, int til) {
+        int pivot = a[til-1];
+        int i = fra-1;
+
+        for (int j = fra; j < til-1; j++) {
+            if (a[j] <= pivot) {
+                i++;
+
+                bytt(a,i,j);
             }
         }
+
+        bytt(a,i+1,til-1);
+
+        return i+1;
     }
 
     /**
@@ -193,43 +218,42 @@ public class Oblig1 {
 
     public static void delsortering(int[] a) {
         int n = a.length;
-        int antPartall = 0;
+        int v = 0;
+        int h = n-1;
+        boolean cont = true;
 
-        // algorithm that loops over array and switches i and j if i is even and j is odd.
-        for(int i=0; i<n/2; i++) {
-            for(int j=(n-i-1); j>n/2-1; j--) {
-                if(a[i]%2 == 0) { // checks if a(i) is even
-                    if(a[j]%2 != 0) { // checks if a(j) is odd
-                        bytt(a, i, j);
-                    }
+        if(n!=0) {
+            while (cont) {
+                while (v <= h && (a[v] % 2 == 1 || a[v] % 2 == -1)) v++;
+                while (v <= h && a[h] % 2 == 0) h--;
+
+                if (v < h) bytt(a, v++, h--);
+                else {
+                    cont = false;
                 }
             }
-        }
-
-        // Counts even numbers
-        for(int i=0; i<n; i++) {
-            if(a[i]%2==0) {
-                antPartall++;
+            System.out.println(Arrays.toString(a));
+            if (v == 0 || v == n) {
+                sorter(a, 0, n);
+            } else {
+                sorter(a, 0, v);
+                sorter(a, v, n);
             }
         }
-
-        sorter(a,0,(n-antPartall));
-        sorter(a,(n-antPartall),n);
     }
 
     /**
-     * Method that rotates the elements of a character array clockwise. Adapted (name only) for assignment 6.
+     * Method that rotates the elements of a character array clockwise and counter-clockwise.
      * @param c
      */
 
-    public static void rotasjonHoyre(char[] c) {
+    public static void rotasjon(char[] c) {
         int n = c.length;
         if (n > 0) {
             char last = c[n - 1]; //saves last element so the value is not lost
 
-            // loops over array and copies the value of the previous element to the next
             for(int i=n-1; i>0; i--) {
-                c[i] = c[i-1];
+                    c[i] = c[i-1];
             }
 
             // gives first character in array the value of the last element for full rotation
@@ -237,24 +261,10 @@ public class Oblig1 {
         }
     }
 
-    /**
-     * Method that rotates the elements of a character array counter-clockwise.
-     * @param c
-     */
 
-    public static void rotasjonVenstre(char[] c) {
-        int n = c.length;
-        if (n > 0) {
-            char first = c[0]; //saves first element so the value is not lost
-
-            // loops over array and copies the value of the next element to the previous
-            for(int i=0; i<(n-1); i++) {
-                c[i] = c[i+1];
-            }
-
-            // gives last character in array the value of the first element for full rotation
-            c[n-1] = first;
-        }
+    public static int gcd(int a, int b)
+    {
+        return b == 0 ? a : gcd(b, a % b);
     }
 
     /**
@@ -263,53 +273,54 @@ public class Oblig1 {
      * @param c
      * @param k
      */
-    public static void rotasjon(char[] c, int k) {
-        while(k!=0) {
-            if(k>0) {
-                rotasjonHoyre(c);
-                k--;
-            } else {
-                rotasjonVenstre(c);
-                k++;
+    public static void rotasjon(char[] c, int k)
+    {
+        int n = c.length;
+        if (n < 2) {
+            return;         // no rotation necessary
+        }
+        if ((k %= n) < 0) {
+            k += n;           // for opposite rotation
+        }
+
+        int s = gcd(n, k);
+
+        for (int l = 0; l < s; l++) {
+            char temp = c[l];
+
+            for (int i = l-k, j = l; i != l; i -= k)  {
+                if (i < 0) {
+                    i += n;
+                }
+                c[j] = c[i]; j = i;
             }
+
+            c[l + k] = temp;
         }
     }
 
     /**
-     * Method that braids two strings together. FIX! SE PÃ… NESTE OPPGAVE!!!!
+     * Method that braids two strings together.
      * @param s
      * @param t
      * @return resultString
      */
     public static String flett(String s, String t) {
-        char[] subStringS = s.toCharArray();
-        char[] subStringT = t.toCharArray();
         String resultString = "";
 
-        int n;
-        boolean sLengst = true;
-
-        if(subStringS.length < subStringT.length) {
-            n = subStringS.length;
-            sLengst = false;
-        } else {
-            n = subStringT.length;
-        }
-
-        for(int i=0; i<n; i++) {
-            resultString += subStringS[i] + "" + subStringT[i];
-        }
-
-        if(sLengst) {
-            for (int i = n; i < subStringS.length; i++) {
-                resultString += subStringS[i];
+        String[] textStrings = {s,t};
+        int maxLengde = textStrings[0].length();
+        int tLengde = textStrings[1].length();
+        if (tLengde > maxLengde) maxLengde = tLengde;
+        int count = 0;
+        while (count < maxLengde) {
+            for (int i = 0; i < textStrings.length; i++) {
+                if (count < textStrings[i].length()) {
+                    resultString += textStrings[i].charAt(count);
+                }
             }
-        } else {
-            for(int i=n; i< subStringT.length; i++) {
-                resultString += subStringT[i];
-            }
+            count++;
         }
-
         return resultString;
     }
 
@@ -320,23 +331,22 @@ public class Oblig1 {
      */
     public static String flett(String ... s) {
         String resultString = "";
-
-        int maxLengde = s[0].length();
-
-        for(int i=0; i<s.length; i++) {
-            if(s[i].length()>maxLengde) {
-                maxLengde = s[i].length();
-            }
-        }
-
-        int count = 0;
-        while(count<maxLengde) {
-            for(int i=0; i<s.length; i++) {
-                if (count < s[i].length()) {
-                    resultString += s[i].charAt(count);
+        if(s.length!=0) {
+            int maxLengde = s[0].length();
+            for (int i = 0; i < s.length; i++) {
+                if (s[i].length() > maxLengde) {
+                    maxLengde = s[i].length();
                 }
             }
-            count++;
+            int count = 0;
+            while(count<maxLengde) {
+                for(int i=0; i<s.length; i++) {
+                    if (count < s[i].length()) {
+                        resultString += s[i].charAt(count);
+                    }
+                }
+                count++;
+            }
         }
 
         return resultString;
@@ -395,7 +405,7 @@ public class Oblig1 {
      */
     public static int[] tredjeMin(int[] a) {
         int n = a.length;
-        if (n < 2) throw      // must have at least three values
+        if (n < 3) throw      // must have at least three values
                 new java.util.NoSuchElementException("a.length(" + n + ") < 3!");
 
         int[] indexOrder = indekssortering(Arrays.copyOfRange(a,0,3));
@@ -442,7 +452,7 @@ public class Oblig1 {
      * Method that checks if string s is contained in string t.
      * @param s
      * @param t
-     * @return inneholdt 
+     * @return inneholdt
      */
     public static boolean inneholdt(String s, String t) {
         char[] sSubstring = s.toCharArray();
@@ -450,7 +460,7 @@ public class Oblig1 {
         int count = 0;
         boolean test = true;
         boolean inneholdt = true;
-         
+
         while((count < sSubstring.length) && test) {
             test = false;
             for(int j=count;j<tSubstring.length; j++) {
