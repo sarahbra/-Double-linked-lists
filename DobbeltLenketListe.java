@@ -1,8 +1,4 @@
-package no.oslomet.cs.algdat;
-
-
-////////////////// class DobbeltLenketListe //////////////////////////////
-
+package Oblig2;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -45,25 +41,50 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     private int endringer;         // antall endringer i listen
 
     public DobbeltLenketListe() {
-        throw new NotImplementedException();
+        hode = hale = null;
+        antall = endringer = 0;
     }
 
     public DobbeltLenketListe(T[] a) {
-        throw new NotImplementedException();
+        this();
+        Objects.requireNonNull(a,"Tabellen a er null!");
+
+        boolean funnet = false;
+        int i= a.length;
+
+        if(i!=0) {
+            do {
+                i--;
+                if (a[i] != null) {
+                    funnet = true;
+                }
+            } while (!funnet);
+
+            hode = hale = new Node<>(a[i], null, null);
+            antall++;
+
+            for (int j = i-1; j >= 0; j--) {
+                if ((a[j]) != null) {
+                    hode = new Node<>(a[j], null, hode);
+                    hode.neste.forrige = hode;
+                    antall++;
+                }
+            }
+        }
     }
 
     public Liste<T> subliste(int fra, int til){
-        throw new NotImplementedException();
+        return null;
     }
 
     @Override
     public int antall() {
-        throw new NotImplementedException();
+        return antall;
     }
 
     @Override
     public boolean tom() {
-        throw new NotImplementedException();
+        return antall() == 0;
     }
 
     @Override
@@ -113,11 +134,40 @@ public class DobbeltLenketListe<T> implements Liste<T> {
 
     @Override
     public String toString() {
-        throw new NotImplementedException();
+        StringBuilder utStreng = new StringBuilder();
+        utStreng.append('[');
+        if (antall!=0) {
+            Node<T> p = hode;
+            utStreng.append(p.verdi);
+
+            p = p.neste;
+
+            while(p!=null) {
+                utStreng.append(',').append(' ').append(p.verdi);
+                p = p.neste;
+            }
+
+        }
+        utStreng.append(']');
+        return utStreng.toString();
     }
 
     public String omvendtString() {
-        throw new NotImplementedException();
+        StringBuilder utStreng = new StringBuilder();
+        utStreng.append('[');
+        if (antall!=0) {
+            Node<T> p = hale;
+            utStreng.append(p.verdi);
+
+            p = p.forrige;
+
+            while(p!=null) {
+                utStreng.append(',').append(' ').append(p.verdi);
+                p = p.forrige;
+            }
+        }
+        utStreng.append(']');
+        return utStreng.toString();
     }
 
     @Override
