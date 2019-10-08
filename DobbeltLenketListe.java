@@ -89,8 +89,7 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         return subliste;
     }
 
-    private static void fraTilKontroll(int antall, int fra, int til)
-    {
+    private static void fraTilKontroll(int antall, int fra, int til) {
         if (fra < 0)
             throw new IndexOutOfBoundsException
                     ("fra(" + fra + ") er negativ!");
@@ -99,9 +98,8 @@ public class DobbeltLenketListe<T> implements Liste<T> {
             throw new IndexOutOfBoundsException
                     ("Subliste > antall (" + antall + ")");
 
-        if(til>antall) {
+        if(til>antall)
             throw new IndexOutOfBoundsException("Til > antall (" + antall + ")");
-        }
 
         if (fra > til)
             throw new IllegalArgumentException
@@ -452,8 +450,25 @@ public class DobbeltLenketListe<T> implements Liste<T> {
             }
         }// class DobbeltLenketListeIterator
 
+    // Benytter boblesortering
     public static <T> void sorter(Liste<T> liste, Comparator<? super T> c) {
-        throw new NotImplementedException();
+        boolean sorted = false;
+        T first;
+        T next;
+        int k;
+        while(!sorted) {
+            sorted = true;
+            for (int i = 0; i < (liste.antall()-1); i++) {
+                first = liste.hent(i);
+                next = liste.hent(i+1);
+                k = c.compare(first,next);
+                if(k>0) {
+                    liste.oppdater(i, next);
+                    liste.oppdater(i+1,first);
+                    sorted = false;
+                }
+            }
+        }
     }
 } // class DobbeltLenketListe
 
