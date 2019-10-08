@@ -3,14 +3,9 @@ package Oblig2;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.NoSuchElementException;
-import java.util.StringJoiner;
 
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.function.Predicate;
-
 
 
 public class DobbeltLenketListe<T> implements Liste<T> {
@@ -58,10 +53,12 @@ public class DobbeltLenketListe<T> implements Liste<T> {
                 if (a[i] != null) {
                     funnet = true;
                 }
-            } while (!funnet);
+            } while (!funnet && i>0);
 
-            hode = hale = new Node<>(a[i], null, null);
-            antall++;
+            if(i>0 || a[i]!=null) {
+                hode = hale = new Node<>(a[i]);
+                antall++;
+            }
 
             for (int j = i-1; j >= 0; j--) {
                 if ((a[j]) != null) {
@@ -74,7 +71,44 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     }
 
     public Liste<T> subliste(int fra, int til){
-        return null;
+        fraTilKontroll(antall,fra,til);
+        DobbeltLenketListe<T> subliste = new DobbeltLenketListe<T>();
+        int count = 0;
+        Node p = hode;
+        if(!(fra==til)) {
+            while(count<fra) {
+                p = p.neste;
+                count++;
+            }
+            subliste.leggInn((T) p.verdi);
+
+            while(count<til-1) {
+                p = p.neste;
+                subliste.leggInn((T) p.verdi);
+                subliste.antall++;
+                count++;
+            }
+        }
+        return subliste;
+    }
+
+    private static void fraTilKontroll(int antall, int fra, int til)
+    {
+        if (fra < 0)
+            throw new IndexOutOfBoundsException
+                    ("fra(" + fra + ") er negativ!");
+
+        if ((fra-til) > antall)
+            throw new IndexOutOfBoundsException
+                    ("Subliste > antall (" + antall + ")");
+
+        if(til>antall) {
+            throw new IndexOutOfBoundsException("Til > antall (" + antall + ")");
+        }
+
+        if (fra > til)
+            throw new IllegalArgumentException
+                    ("fra(" + fra + ") > til(" + til + ") - illegalt intervall!");
     }
 
     @Override
@@ -89,7 +123,19 @@ public class DobbeltLenketListe<T> implements Liste<T> {
 
     @Override
     public boolean leggInn(T verdi) {
-        throw new NotImplementedException();
+        boolean lagtInn = false;
+        Objects.requireNonNull(verdi, "Objektet som skal legges inn skal ha en verdi");
+        Node<T> ny = new Node<>(verdi,hale,null);
+        if(tom()) {
+            hode = ny;
+        } else {
+            hale.neste = ny;
+        }
+        hale = ny;
+        lagtInn = true;
+        antall++;
+        endringer++;
+        return lagtInn;
     }
 
     @Override
@@ -102,9 +148,32 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         throw new NotImplementedException();
     }
 
+    private Node<T> finnNode(int indeks) {
+        Node<T> p;
+        int count;
+        if(indeks >= antall/2) {
+            p = hale;
+            count = antall-1;
+            while (count > indeks) {
+                p = p.forrige;
+                count--;
+            }
+        } else {
+            p = hode;
+            count = 0;
+            while (count < indeks) {
+                p = p.neste;
+                count++;
+            }
+        }
+        return p;
+    }
+
     @Override
     public T hent(int indeks) {
-        throw new NotImplementedException();
+        indeksKontroll(indeks,false);
+        T verdi = finnNode(indeks).verdi;
+        return verdi;
     }
 
     @Override
@@ -114,7 +183,13 @@ public class DobbeltLenketListe<T> implements Liste<T> {
 
     @Override
     public T oppdater(int indeks, T nyverdi) {
-        throw new NotImplementedException();
+        indeksKontroll(indeks,false);
+        Objects.requireNonNull(nyverdi, "Ikke tillatt med null-verdier i oppdater");
+        Node endres = finnNode(indeks);
+        T returneres = (T) endres.verdi;
+        endres.verdi = nyverdi;
+        endringer++;
+        return returneres;
     }
 
     @Override
@@ -186,7 +261,9 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         private int iteratorendringer;
 
         private DobbeltLenketListeIterator(){
-            throw new NotImplementedException();
+            denne = hode;     // p starter på den første i listen
+            fjernOK = false;  // blir sann når next() kalles
+            iteratorendringer = endringer;  // teller endringer
         }
 
         private DobbeltLenketListeIterator(int indeks){
@@ -195,7 +272,7 @@ public class DobbeltLenketListe<T> implements Liste<T> {
 
         @Override
         public boolean hasNext(){
-            throw new NotImplementedException();
+            return denne != null;
         }
 
         @Override
