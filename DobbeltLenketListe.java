@@ -1,9 +1,9 @@
 package Oblig2;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.util.*;
-
+/*
+author Sarah Rastad, s317473
+ */
 
 public class DobbeltLenketListe<T> implements Liste<T> {
 
