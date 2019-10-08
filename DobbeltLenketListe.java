@@ -2,10 +2,7 @@ package Oblig2;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.Comparator;
-
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 
 
 public class DobbeltLenketListe<T> implements Liste<T> {
@@ -313,7 +310,9 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         T verdi;
         while(antall>0) {
             verdi = fjern(0);
+            endringer--;
         }
+        endringer++;
     }
 
     */
@@ -330,8 +329,8 @@ public class DobbeltLenketListe<T> implements Liste<T> {
             p.neste = null;
             p = temp;
             count++;
-            endringer++;
         }
+        endringer++;
         antall = 0;
     }
 
@@ -375,11 +374,11 @@ public class DobbeltLenketListe<T> implements Liste<T> {
 
     @Override
     public Iterator<T> iterator() {
-        throw new NotImplementedException();
+        return new DobbeltLenketListeIterator();
     }
 
     public Iterator<T> iterator(int indeks) {
-        throw new NotImplementedException();
+        return new DobbeltLenketListeIterator(indeks);
     }
 
     private class DobbeltLenketListeIterator implements Iterator<T>
@@ -395,7 +394,17 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         }
 
         private DobbeltLenketListeIterator(int indeks){
-            throw new NotImplementedException();
+            if(indeks<0 || indeks>= antall)
+                throw new IndexOutOfBoundsException("Indeks må være mellom 0 og " + (antall-1));
+            denne = hode;
+            int count = 0;
+            while(count<indeks) {
+                denne = denne.neste;
+                count++;
+            }
+
+            fjernOK = false;
+            iteratorendringer = endringer;
         }
 
         @Override
@@ -405,15 +414,43 @@ public class DobbeltLenketListe<T> implements Liste<T> {
 
         @Override
         public T next(){
-            throw new NotImplementedException();
+            if(endringer!=iteratorendringer)
+                throw new ConcurrentModificationException("Endringer != iteratorendringer");
+            if(!hasNext())
+                throw new NoSuchElementException("Ikke flere elementer i listen");
+            fjernOK = true;
+            T verdi = denne.verdi;
+            denne = denne.neste;
+
+            return verdi;
         }
 
         @Override
-        public void remove(){
-            throw new NotImplementedException();
-        }
-
-    } // class DobbeltLenketListeIterator
+        public void remove() {
+            if (endringer != iteratorendringer)
+                throw new ConcurrentModificationException("Listen er endra");
+            if (!fjernOK)
+                throw new IllegalStateException("Ulovlig tilstand!");
+            fjernOK = false;
+            if (denne == null) {
+                if (antall == 1) {
+                    hode = hale = null;
+                } else {
+                    hale = hale.forrige;
+                    hale.neste = null;
+                }
+            } else if (denne.forrige == hode) {
+                hode = denne;
+                hode.forrige = null;
+            } else {
+                denne.forrige.forrige.neste = denne;
+                denne.forrige = denne.forrige.forrige;
+            }
+            antall--;
+            endringer++;
+            iteratorendringer++;
+            }
+        }// class DobbeltLenketListeIterator
 
     public static <T> void sorter(Liste<T> liste, Comparator<? super T> c) {
         throw new NotImplementedException();
