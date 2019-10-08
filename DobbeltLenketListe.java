@@ -140,12 +140,49 @@ public class DobbeltLenketListe<T> implements Liste<T> {
 
     @Override
     public void leggInn(int indeks, T verdi) {
-        throw new NotImplementedException();
+        Objects.requireNonNull(verdi, "Objektet som skal legges inn skal ha en verdi");
+        if(indeks>antall || indeks < 0) {
+            throw new IndexOutOfBoundsException("Indeks må være mellom 0 og " + (antall-1));
+        }
+        Node leggesInn;
+
+        if(indeks == 0) {
+            if(antall == 0) {
+                leggesInn = new Node(verdi,null,null);
+                hode = leggesInn;
+                hale = leggesInn;
+            } else if (antall == 1) {
+                leggesInn = new Node(verdi, null, hale);
+                hale.forrige = leggesInn;
+                hode = leggesInn;
+            } else {
+                leggesInn = new Node(verdi, null, hode);
+                hode.forrige = leggesInn;
+                hode = leggesInn;
+            }
+        } else if (indeks == antall) {
+            leggesInn = new Node(verdi, hale, null);
+            hale.neste = leggesInn;
+            hale = leggesInn;
+        } else {
+            Node p = finnNode(indeks);
+            leggesInn = new Node(verdi,p.forrige,p);
+            p.forrige.neste = leggesInn;
+            p.forrige = leggesInn;
+        }
+
+        antall++;
+        endringer++;
     }
 
     @Override
     public boolean inneholder(T verdi) {
-        throw new NotImplementedException();
+        boolean inneholder = false;
+        int indeks = indeksTil(verdi);
+        if(indeks!=-1) {
+            inneholder = true;
+        }
+        return inneholder;
     }
 
     private Node<T> finnNode(int indeks) {
@@ -178,7 +215,21 @@ public class DobbeltLenketListe<T> implements Liste<T> {
 
     @Override
     public int indeksTil(T verdi) {
-        throw new NotImplementedException();
+        int returneres = -1;
+        if(verdi!=null) {
+            int count = 0;
+            Node p = hode;
+            while (count < antall) {
+                if (verdi.equals(p.verdi)) {
+                    if(returneres==-1) {
+                        returneres = count;
+                    }
+                }
+                p = p.neste;
+                count++;
+            }
+        }
+        return returneres;
     }
 
     @Override
