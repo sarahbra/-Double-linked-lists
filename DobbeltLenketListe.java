@@ -170,7 +170,6 @@ public class DobbeltLenketListe<T> implements Liste<T> {
             p.forrige.neste = leggesInn;
             p.forrige = leggesInn;
         }
-
         antall++;
         endringer++;
     }
@@ -244,18 +243,96 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     }
 
     @Override
+    //Her trengs det overclocking av prosessor
+
     public boolean fjern(T verdi) {
-        throw new NotImplementedException();
+        if (verdi == null) return false;
+        Node p = hode;
+        while (p != null) {
+            if (p.verdi.equals(verdi)) break;
+            p = p.neste;
+        }
+
+        if (p == hode) {
+            if(p == hale) {
+                hale = hode = null;
+            } else {
+                hode = hode.neste;
+                hode.forrige = null;
+            }
+        } else if (p == null) {
+            return false;
+        } else if (p==hale) {
+            hale = p.forrige;
+            hale.neste = null;
+        } else {
+            p.forrige.neste = p.neste;
+            p.neste.forrige = p.forrige;
+        }
+
+        endringer++;
+        antall--;
+
+        return true;
     }
 
     @Override
     public T fjern(int indeks) {
-        throw new NotImplementedException();
+        if(indeks>=antall || indeks < 0) {
+            throw new IndexOutOfBoundsException("Indeks må være mellom 0 og " + (antall-1));
+        }
+        T temp;
+        if(indeks==0) {
+            temp = hode.verdi;
+            if(antall==1) {
+                hode = hale = null;
+            } else {
+                hode.neste.forrige = null;
+                hode = hode.neste;
+            }
+        } else if (indeks==antall-1) {
+            temp = hale.verdi;
+            hale.forrige.neste = null;
+            hale = hale.forrige;
+        } else {
+            Node<T> p = finnNode(indeks);
+            temp = p.verdi;
+            p.forrige.neste = p.neste;
+            p.neste.forrige = p.forrige;
+        }
+        antall--;
+        endringer++;
+        return temp;
     }
 
+
     @Override
+    //Brukte 31 ms med 10000 kjøringer på liste med 15 elementer
+    /*
     public void nullstill() {
-        throw new NotImplementedException();
+        T verdi;
+        while(antall>0) {
+            verdi = fjern(0);
+        }
+    }
+
+    */
+
+    // Brukte 22 ms på samme test. Det vil si noe raskere (men min fjern-metode er treig)
+    public void nullstill() {
+        Node p = hode;
+        Node temp;
+        int count = 0;
+        while(count<antall) {
+            p.verdi = null;
+            p.forrige = null;
+            temp = p.neste;
+            p.neste = null;
+            p = temp;
+            count++;
+            endringer++;
+        }
+        antall = 0;
     }
 
     @Override
