@@ -67,6 +67,13 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         }
     }
 
+    /**
+     * Method that creates a sublist of the doubly linked list from parameter fra, to parameter til,
+     * excluding til.
+     * @param fra
+     * @param til
+     * @return
+     */
     public Liste<T> subliste(int fra, int til){
         fraTilKontroll(antall,fra,til);
         DobbeltLenketListe<T> subliste = new DobbeltLenketListe<T>();
@@ -89,6 +96,12 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         return subliste;
     }
 
+    /**
+     * Method that checks if a given interval is valid.
+     * @param antall
+     * @param fra
+     * @param til
+     */
     private static void fraTilKontroll(int antall, int fra, int til) {
         if (fra < 0)
             throw new IndexOutOfBoundsException
@@ -116,6 +129,11 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         return antall() == 0;
     }
 
+    /**
+     * Adds value T 'verdi' to linked list at the tail of the list
+     * @param verdi
+     * @return
+     */
     @Override
     public boolean leggInn(T verdi) {
         boolean lagtInn = false;
@@ -134,6 +152,11 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     }
 
     @Override
+    /**
+     * Adds value T 'verdi' to linked list at a given index-position
+     * @param verdi
+     * @param indeks
+     */
     public void leggInn(int indeks, T verdi) {
         Objects.requireNonNull(verdi, "Objektet som skal legges inn skal ha en verdi");
         if(indeks>antall || indeks < 0) {
@@ -170,15 +193,25 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     }
 
     @Override
+    /**
+     * Method that checks if value T 'verdi' exists in list
+     * @param verdi
+     * @return inneholdt
+     */
     public boolean inneholder(T verdi) {
-        boolean inneholder = false;
+        boolean inneholdt = false;
         int indeks = indeksTil(verdi);
         if(indeks!=-1) {
-            inneholder = true;
+            inneholdt = true;
         }
-        return inneholder;
+        return inneholdt;
     }
 
+    /**
+     * Finds node in doubly linked list at given index
+     * @param indeks
+     * @return p
+     */
     private Node<T> finnNode(int indeks) {
         Node<T> p;
         int count;
@@ -201,6 +234,11 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     }
 
     @Override
+    /**
+     * Returns value T 'verdi' of node at chosen index
+     * @param indeks
+     * @return verdi
+     */
     public T hent(int indeks) {
         indeksKontroll(indeks,false);
         T verdi = finnNode(indeks).verdi;
@@ -208,6 +246,12 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     }
 
     @Override
+    /**
+     * Method that finds the index of the first instance of parameter value T 'verdi' if it exists.
+     * Returns -1 if it doesn't
+     * @param verdi
+     * @return returneres
+     */
     public int indeksTil(T verdi) {
         int returneres = -1;
         if(verdi!=null) {
@@ -226,6 +270,12 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         return returneres;
     }
 
+    /**
+     * Updates value T 'nyverdi' at given index. Returns old value
+     * @param indeks
+     * @param nyverdi
+     * @return returneres
+     */
     @Override
     public T oppdater(int indeks, T nyverdi) {
         indeksKontroll(indeks,false);
@@ -237,6 +287,12 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         return returneres;
     }
 
+    /**
+     *Removes first instance of value T 'verdi' if it exists in list. Returns false if
+     * it couldn't find value.
+     * @param verdi
+     * return fjernet
+     */
     @Override
     //Her trengs det overclocking av prosessor
 
@@ -271,6 +327,11 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         return true;
     }
 
+    /**
+     * Removes node at chosen index if it exists. Returns value.
+     * @param indeks
+     * @return temp
+     */
     @Override
     public T fjern(int indeks) {
         if(indeks>=antall || indeks < 0) {
@@ -316,6 +377,9 @@ public class DobbeltLenketListe<T> implements Liste<T> {
     */
 
     // Brukte 22 ms på samme test. Det vil si noe raskere (men min fjern-metode er treig)
+    /**
+     * Resets doubly linked list (removes all elements)
+     */
     public void nullstill() {
         Node p = hode;
         Node temp;
@@ -352,6 +416,10 @@ public class DobbeltLenketListe<T> implements Liste<T> {
         return utStreng.toString();
     }
 
+    /**
+     * Returns string of doubly linked list values in reversed order
+     * @return
+     */
     public String omvendtString() {
         StringBuilder utStreng = new StringBuilder();
         utStreng.append('[');
@@ -423,6 +491,10 @@ public class DobbeltLenketListe<T> implements Liste<T> {
             return verdi;
         }
 
+        /**
+         * Removes node to the left of 'this' if the iterator has passed the given element and it is
+         * in a legal state
+         */
         @Override
         public void remove() {
             if (endringer != iteratorendringer)
@@ -447,8 +519,8 @@ public class DobbeltLenketListe<T> implements Liste<T> {
             antall--;
             endringer++;
             iteratorendringer++;
-            }
-        }// class DobbeltLenketListeIterator
+        }
+    }// class DobbeltLenketListeIterator
 
     // Benytter boblesortering
     public static <T> void sorter(Liste<T> liste, Comparator<? super T> c) {
