@@ -372,10 +372,53 @@ public class ObligSBinTre<T> implements Beholder<T>
     utstreng += "]";
     return utstreng;
   }
-  
+
+  /**
+   * Metode som returnerer en streng-array med binærtreets greiner fra venstre til høyre.
+   * @return grener
+   */
   public String[] grener()
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+    String[] grener;
+    if(!tom()) {
+      Node<T> p = rot;
+      Stakk<Node<T>> nystakk;
+      Kø<Stakk<Node<T>>> kø = new TabellKø<>();
+      while (p.venstre != null) p = p.venstre;
+      Node<T> siste = p;
+      while (siste != null) {
+        if (p != null && p.venstre == null && p.høyre == null) {
+          nystakk = new TabellStakk<>();
+          nystakk.leggInn(p);
+          while (p != null) {
+            p = p.forelder;
+            if (p != null) {
+              nystakk.leggInn(p);
+            }
+          }
+          if(nystakk!=null) {
+            kø.leggInn(nystakk);
+          }
+        }
+        p = nesteInorden(siste);
+        siste = p;
+      }
+      grener = new String[kø.antall()];
+      int count = 0;
+
+      while(!kø.tom()) {
+        nystakk = kø.taUt();
+        grener[count] = String.format("[%s", nystakk.taUt().verdi);
+        while(!nystakk.tom()) {
+          grener[count] += String.format(", %s", nystakk.taUt().verdi);
+        }
+        grener[count] += "]";
+        count++;
+      }
+    } else {
+      grener = new String[0];
+    }
+    return grener;
   }
   
   public String bladnodeverdier()
