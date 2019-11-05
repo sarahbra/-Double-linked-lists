@@ -45,7 +45,12 @@ public class ObligSBinTre<T> implements Beholder<T>
     antall = 0;
     comp = c;
   }
-  
+
+  /**
+   * Metode som legger inn T verdi i binærtre på riktig plass.
+   * @param verdi
+   * @return
+   */
   @Override
   public final boolean leggInn(T verdi)
     {
@@ -91,19 +96,86 @@ public class ObligSBinTre<T> implements Beholder<T>
       else if (cmp > 0) p = p.høyre;
       else return true;
     }
-
     return false;
   }
-  
+
+  /**
+   * Metode som fjerner første instanse av verdi T i inorden i binærtre. Returnerer hvorvidt fjerningen var vellykket
+   * (altså om verdi T fantes i binærtre).
+   * @param verdi
+   * @return boolean fjernet
+   */
   @Override
-  public boolean fjern(T verdi)
+  public boolean fjern(T verdi)  // hører til klassen SBinTre
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+    if (verdi == null) return false;  // treet har ingen nullverdier
+
+    Node<T> p = rot, q = null;   // q skal være forelder til p
+
+    while (p != null)            // leter etter verdi
+    {
+      int cmp = comp.compare(verdi,p.verdi);      // sammenligner
+      if (cmp < 0) { q = p; p = p.venstre; }      // går til venstre
+      else if (cmp > 0) { q = p; p = p.høyre; }   // går til høyre
+      else break;    // den søkte verdien ligger i p
+    }
+    if (p == null) return false;   // finner ikke verdi
+
+    if (p.venstre == null || p.høyre == null)  // Tilfelle 1) og 2)
+    {
+      Node<T> b = p.venstre != null ? p.venstre : p.høyre;  // b for barn
+      if (p == rot) {
+        rot = b;
+        if(rot!=null) rot.forelder = null;
+      }
+      else if (p == q.venstre) {
+        q.venstre = b;
+        if(b!=null) b.forelder = q;
+      }
+      else {
+        q.høyre = b;
+        if(b!=null) b.forelder = q;
+      }
+    }
+    else  // Tilfelle 3)
+    {
+      Node<T> s = p, r = p.høyre;   // finner neste i inorden
+      while (r.venstre != null)
+      {
+        s = r;    // s er forelder til r
+        r = r.venstre;
+      }
+
+      p.verdi = r.verdi;   // kopierer verdien i r til p
+
+      if(r.høyre!=null) r.høyre.forelder = s;
+      if (s != p) {
+        s.venstre = r.høyre;
+      }
+      else {
+        s.høyre = r.høyre;
+      }
+    }
+
+    antall--;   // det er nå én node mindre i treet
+    return true;
   }
-  
+
+  /**
+   * Fjerner alle instanser av T verdi i binærtre. Returnerer antall instanser av verdi (0 dersom verdi ikke fantes i
+   * treet).
+   * @param verdi
+   * @return count
+   */
   public int fjernAlle(T verdi)
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+    boolean cont = true;
+    int count = 0;
+    while(cont) {
+      cont = fjern(verdi);
+      if(cont) count++;
+    }
+    return count;
   }
   
   @Override
@@ -111,7 +183,12 @@ public class ObligSBinTre<T> implements Beholder<T>
   {
     return antall;
   }
-  
+
+  /**
+   * Metode som finner antall instanser av T verdi i binærtre
+   * @param verdi
+   * @return count
+   */
   public int antall(T verdi)
   {
     int count = 0;
@@ -136,11 +213,20 @@ public class ObligSBinTre<T> implements Beholder<T>
   {
     return antall == 0;
   }
-  
+
+  /**
+   * Metode som nullstiller binærtre.
+   */
   @Override
   public void nullstill()
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+    T somSkalFjernes;
+    while(!tom()) {
+      Node<T> p = rot;
+      while(p.venstre!=null) p = p.venstre;
+      somSkalFjernes = p.verdi;
+      fjernAlle(somSkalFjernes);
+    }
   }
 
   /** Visste ikke om rekursjon var tillatt i nesteInorden, eller om det bare var forbudt i skrivUt-metoden,
@@ -166,7 +252,11 @@ public class ObligSBinTre<T> implements Beholder<T>
     }
     return p;
   }
-  
+
+  /**
+   * Metode som returnerer en streng av binærtreets grener i inorden.
+   * @return utstreng
+   */
   @Override
   public String toString()
   {
@@ -185,10 +275,34 @@ public class ObligSBinTre<T> implements Beholder<T>
     utstreng += "]";
     return utstreng;
   }
-  
+
+  /**
+   * Metode som returnerer en streng av binærtreet i motsatt inorden ved hjelp av en hjelpestakk
+   * @return utstreng
+   */
+
   public String omvendtString()
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+    String utstreng = "[";
+    boolean fortsett = true;
+    if(!tom()) {
+      Stakk<Node> stakk = new TabellStakk<>();
+      Node<T> p = rot;
+      while (p.venstre != null) p = p.venstre;
+      stakk.leggInn(p);
+      while (fortsett) {
+        p = nesteInorden(p);
+        if (p != null) stakk.leggInn(p);
+        else fortsett = false;
+      }
+      utstreng += String.format("%d", stakk.taUt().verdi);
+      while (!stakk.tom()) {
+        p = stakk.taUt();
+        utstreng += String.format(", %d", p.verdi);
+      }
+    }
+    utstreng += "]";
+    return utstreng;
   }
   
   public String høyreGren()
