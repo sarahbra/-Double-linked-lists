@@ -265,10 +265,10 @@ public class ObligSBinTre<T> implements Beholder<T>
     if(!tom()) {
       Node<T> p = rot;
       while(p.venstre!=null) p = p.venstre;
-      utstreng += String.format("%d", p.verdi);
+      utstreng += String.format("%s", p.verdi);
       while(fortsett) {
         p = nesteInorden(p);
-        if (p!=null) utstreng += String.format(", %d", p.verdi);
+        if (p!=null) utstreng += String.format(", %s", p.verdi);
         else fortsett = false;
       }
     }
@@ -295,10 +295,10 @@ public class ObligSBinTre<T> implements Beholder<T>
         if (p != null) stakk.leggInn(p);
         else fortsett = false;
       }
-      utstreng += String.format("%d", stakk.taUt().verdi);
+      utstreng += String.format("%s", stakk.taUt().verdi);
       while (!stakk.tom()) {
         p = stakk.taUt();
-        utstreng += String.format(", %d", p.verdi);
+        utstreng += String.format(", %s", p.verdi);
       }
     }
     utstreng += "]";
@@ -307,12 +307,70 @@ public class ObligSBinTre<T> implements Beholder<T>
   
   public String høyreGren()
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+    String utstreng = "[";
+    if(!tom()) {
+      Node<T> p = rot;
+      utstreng += String.format("%s", p.verdi);
+      while(!(p.høyre == null && p.venstre == null)) {
+        if(p.høyre != null) p = p.høyre;
+        else p = p.venstre;
+        utstreng += String.format(", %s", p.verdi);
+      }
+    }
+    utstreng += "]";
+    return utstreng;
   }
-  
-  public String lengstGren()
+
+  /**
+   * Returnerer høyden til en vilkårlig node
+   * @param p
+   * @return
+   */
+  private static int høyde(Node<?> p)  // ? betyr vilkårlig type
   {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+    int høyde = 1;
+    while(p.forelder!=null) {
+      p = p.forelder;
+      høyde++;
+    }
+    return høyde;
+  }
+
+  /**
+   * Returnerer en streng med den lengste greinen i et binærtre.
+   * @return utstreng
+   */
+  public String lengstGren() {
+    String utstreng = "[";
+    if(!tom()) {
+      Node<T> p = rot;
+      Stakk<Node> stakk = new TabellStakk<>();
+      while (p.venstre != null) p = p.venstre;
+      int maksHøyde = høyde(p);
+      Node<T> lengst = p;
+      while (p != null) {
+        p = nesteInorden(p);
+        if (p!=null && p.venstre == null && p.høyre == null) {
+          if (høyde(p) > maksHøyde) {
+            maksHøyde = høyde(p);
+            lengst = p;
+          }
+        }
+      }
+      stakk.leggInn(lengst);
+      while(lengst!=null) {
+        lengst = lengst.forelder;
+        if(lengst!=null) {
+          stakk.leggInn(lengst);
+        }
+      }
+      utstreng += String.format("%s", stakk.taUt().verdi);
+      while(!stakk.tom()) {
+        utstreng += String.format(", %s", stakk.taUt().verdi);
+      }
+    }
+    utstreng += "]";
+    return utstreng;
   }
   
   public String[] grener()
