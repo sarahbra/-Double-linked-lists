@@ -177,8 +177,6 @@ public class ObligSBinTre<T> implements Beholder<T>
       cont = fjern(verdi);
       if(cont) count++;
     }
-    endringer -= count;
-    antall -= count;
     return count;
   }
   
@@ -232,9 +230,6 @@ public class ObligSBinTre<T> implements Beholder<T>
         somSkalFjernes = p.verdi;
         fjernAlle(somSkalFjernes);
       }
-    }
-    if(somSkalFjernes!=null) {
-      endringer++;
     }
     antall = 0;
   }
@@ -540,10 +535,12 @@ public class ObligSBinTre<T> implements Beholder<T>
       removeOK = false;
       if(p!=null) {
         while (p.venstre != null) {
+          q = p;
           p = p.venstre;
         }
+      } else {
+        p = null;
       }
-      this.p = p;
     }
     
     @Override
@@ -562,14 +559,15 @@ public class ObligSBinTre<T> implements Beholder<T>
       removeOK = true;
 
       T verdi;
-      if(erBlad(this.p)) {
-      } else {
-        while(!(erBlad(this.p))) {
-          if(nesteInorden(p)!=null) this.p = nesteInorden(p);
+      while(!(erBlad(p))) {
+        if(nesteInorden(p)!=null) {
+          p = nesteInorden(p);
+          q = p.forelder;
         }
       }
-      verdi = this.p.verdi;
-      this.p = nesteInorden(p);
+      verdi = p.verdi;
+      p = nesteInorden(p);
+      if(p!=null && p.forelder!= null) q = p.forelder;
       return verdi;
     }
     
