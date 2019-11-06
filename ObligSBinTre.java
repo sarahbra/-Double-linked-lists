@@ -420,18 +420,100 @@ public class ObligSBinTre<T> implements Beholder<T>
     }
     return grener;
   }
-  
-  public String bladnodeverdier()
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+
+  /**
+   * Enkel test for å se om noden er en bladnode.
+   * @param p
+   * @return boolean bladnode
+   */
+  public static boolean erBlad(Node<?> p) {
+    if(p == null) return false;
+    if(p.høyre == null && p.venstre == null) return true;
+    else return false;
   }
-  
-  public String postString()
-  {
-    throw new UnsupportedOperationException("Ikke kodet ennå!");
+
+  /**
+   * Parser streng til annen streng
+   * @param originalstring
+   * @param parsesPå
+   * @return
+   */
+  public static String parseString(String originalstring, String parsesPå) {
+    return originalstring + parsesPå;
   }
-  
-  @Override
+
+  /**
+   * Rekursiv metode for å finne bladnoder utfra node
+   * @param p
+   * @param utstring
+   */
+  public static void printBlader(Node<?> p, String[] utstring) {
+    if (p==null) return;
+    if (erBlad(p)) {
+      utstring[0] = parseString(utstring[0],String.format("%s, ", p.verdi));
+    }
+
+    printBlader(p.venstre, utstring);
+    printBlader(p.høyre, utstring);
+  }
+
+  /**
+   * Metode som benytter rotnode for å finne dens bladnoder og returnerer streng med bladnoder fra venstre til høyre
+   * etter ønsket format.
+   * @param returstreng
+   * @return
+   */
+  public String printBlader(String[] returstreng) {
+    returstreng[0] += "[";
+    printBlader(rot, returstreng);
+    if ((returstreng[0].length() > 1)) {
+      returstreng[0] = returstreng[0].substring(0, returstreng[0].length() - 2);
+    }
+    return returstreng[0] + "]";
+  }
+
+  /**
+   * Returnerer streng med bladnodeverdier
+   * @return
+   */
+  public String bladnodeverdier() {
+    String[] streng = {""};
+    String resultat = printBlader(streng);
+    return resultat;
+  }
+
+  /**
+   * Metode som returnerer en streng av noder i binærtre i postorden ved hjelp av to stakker.
+   * @return utstreng
+   */
+  public String postString() {
+      String utstreng = "[";
+      Stakk<Node<T>> s1 = new TabellStakk<>();
+      Stakk<Node<T>> s2 = new TabellStakk<>();
+
+      if(rot!=null) s1.leggInn(rot);
+
+      while (!s1.tom()) {
+        Node temp = s1.taUt();
+        s2.leggInn(temp);
+        if(temp.venstre!=null){         //traverserer fra rot til venstre, så høyre side for å finne objekter i postorden
+          s1.leggInn(temp.venstre);
+        }
+        if(temp.høyre!=null){
+          s1.leggInn(temp.høyre);
+        }
+      }
+
+      if(!s2.tom()) utstreng += String.format("%s", s2.taUt());
+      while(!s2.tom()){
+        utstreng += String.format(", %s", s2.taUt());
+      }
+      utstreng += "]";
+      return utstreng;
+    }
+
+
+    @Override
   public Iterator<T> iterator()
   {
     return new BladnodeIterator();
