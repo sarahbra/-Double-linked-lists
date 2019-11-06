@@ -561,22 +561,35 @@ public class ObligSBinTre<T> implements Beholder<T>
       T verdi;
       while(!(erBlad(p))) {
         if(nesteInorden(p)!=null) {
+          q = p;
           p = nesteInorden(p);
-          q = p.forelder;
         }
       }
       verdi = p.verdi;
+      if(p!=null) q = p;
       p = nesteInorden(p);
-      if(p!=null && p.forelder!= null) q = p.forelder;
       return verdi;
     }
-    
+
+    /**
+     * Beklager. Er veldig skutt etter å ha vært syk i det siste (fysisk og psykisk), og remove ble for mye for meg
+     * i dag. Tenkte det skulle være en enkel implementering da q vil peke på en bladnode s.a vi ikke måtte tenke
+     * på qs barn, men ting gikk ikke som jeg tenkte.
+     */
     @Override
-    public void remove()
-    {
-      throw new UnsupportedOperationException("Ikke kodet ennå!");
+    public void remove() {
+      if (endringer != iteratorendringer)
+        throw new ConcurrentModificationException("Listen er endra");
+      if (!removeOK)
+        throw new IllegalStateException("Ulovlig tilstand!");
+      removeOK = false;
+      if (q == rot) q = p = null;     //Siste verdi
+      if (q.forelder.venstre == q) q.forelder.venstre = null;
+      if(q.forelder.høyre == q) q.forelder.høyre = null;
+      q = null;
+      antall--;
+      endringer++;
+      iteratorendringer++;
     }
-
   } // BladnodeIterator
-
 } // ObligSBinTre
