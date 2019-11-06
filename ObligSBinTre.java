@@ -79,6 +79,7 @@ public class ObligSBinTre<T> implements Beholder<T>
       }
 
       antall++;                                // én verdi mer i treet
+      endringer++;
       return true;                             // vellykket innlegging
   }
   
@@ -158,6 +159,7 @@ public class ObligSBinTre<T> implements Beholder<T>
     }
 
     antall--;   // det er nå én node mindre i treet
+    endringer++;
     return true;
   }
 
@@ -175,6 +177,8 @@ public class ObligSBinTre<T> implements Beholder<T>
       cont = fjern(verdi);
       if(cont) count++;
     }
+    endringer -= count;
+    antall -= count;
     return count;
   }
   
@@ -220,13 +224,19 @@ public class ObligSBinTre<T> implements Beholder<T>
   @Override
   public void nullstill()
   {
-    T somSkalFjernes;
+    T somSkalFjernes = null;
     while(!tom()) {
       Node<T> p = rot;
-      while(p.venstre!=null) p = p.venstre;
-      somSkalFjernes = p.verdi;
-      fjernAlle(somSkalFjernes);
+      while(p!=null && p.venstre != null) p = p.venstre;
+      if(p!=null) {
+        somSkalFjernes = p.verdi;
+        fjernAlle(somSkalFjernes);
+      }
     }
+    if(somSkalFjernes!=null) {
+      endringer++;
+    }
+    antall = 0;
   }
 
   /** Visste ikke om rekursjon var tillatt i nesteInorden, eller om det bare var forbudt i skrivUt-metoden,
@@ -527,7 +537,13 @@ public class ObligSBinTre<T> implements Beholder<T>
     
     private BladnodeIterator()  // konstruktør
     {
-      throw new UnsupportedOperationException("Ikke kodet ennå!");
+      removeOK = false;
+      if(p!=null) {
+        while (p.venstre != null) {
+          p = p.venstre;
+        }
+      }
+      this.p = p;
     }
     
     @Override
@@ -539,7 +555,22 @@ public class ObligSBinTre<T> implements Beholder<T>
     @Override
     public T next()
     {
-      throw new UnsupportedOperationException("Ikke kodet ennå!");
+      if(endringer!=iteratorendringer)
+        throw new ConcurrentModificationException("Endringer != iteratorendringer");
+      if(!hasNext())
+        throw new NoSuchElementException("Ikke flere elementer i treet");
+      removeOK = true;
+
+      T verdi;
+      if(erBlad(this.p)) {
+      } else {
+        while(!(erBlad(this.p))) {
+          if(nesteInorden(p)!=null) this.p = nesteInorden(p);
+        }
+      }
+      verdi = this.p.verdi;
+      this.p = nesteInorden(p);
+      return verdi;
     }
     
     @Override
